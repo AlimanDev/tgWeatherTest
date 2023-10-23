@@ -13,9 +13,5 @@ class WeatherRequest(BaseModel):
     fact: WeatherFact
 
 
-class WeatherResponse(WeatherFact):
-    pass
-
-
 class CityWeather(WeatherFact):
     timestamp: float

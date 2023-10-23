@@ -5,19 +5,20 @@ from django.conf import settings
 from apps.weather.schemas import CityWeather, WeatherRequest
 from apps.weather.utils import JsonCRUD
 
+js = JsonCRUD(f"{settings.BASE_DIR}/data/", 'cities.json')
 
-js = JsonCRUD(f"{settings.BASE_DIR}/data/",  'cities.json')
 
-
-def weather_save(city: str, data: WeatherRequest):
-    city_weather = CityWeather.model_validate({
+def weather_save(city: str, data: WeatherRequest) -> dict:
+    data = {
         'temp': data.fact.temp,
         'wind_speed': data.fact.wind_speed,
         'pressure_mm': data.fact.pressure_mm,
         'timestamp': datetime.now().timestamp(),
-    })
-
+    }
+    city_weather = CityWeather.model_validate(data)
     js.json_write(city, city_weather)
+
+    return data
 
 
 def get_prev_weather(city: str) -> dict | None:

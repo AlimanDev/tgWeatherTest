@@ -1,23 +1,31 @@
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from apps.weather.schemas import WeatherResponse
+from apps.weather.serializers import CitySerializer, ResultSerializer
 from apps.weather.services import get_prev_weather, weather_save
 from apps.weather.utils import geo_pos, weather
 
 
-@api_view(['GET'])
-def get_weather(request):
-    """Возвращает погоду города"""
+class WeatherAPI(APIView):
 
-    if request.method == 'GET':
-        city = request.GET.get('city')
-        lat, lon = geo_pos(city=city)
+    def get(self, request, *args, **kwargs):
+        serializer = CitySerializer(data=request.GET)
+        serializer.is_valid(raise_exception=True)
+        city = serializer.data['city']
 
-        data = get_prev_weather(city)
-        if not data:
-            data = weather(lat, lon)
-            weather_save(city, data)
+        # lat, lon = geo_pos(city=city)
+        # data = get_prev_weather(city)
+        # if not data:
+        #     req = weather(lat, lon)
+        #     data = weather_save(city, req)
+        # Mock
+        data = {
+            "temp": 12,
+            "wind_speed": 1.3,
+            "pressure_mm": 729
+        }
 
-        model_result = WeatherResponse.model_validate(data.fact.__dict__)
-        return JsonResponse(model_result.model_dump())
+        result = ResultSerializer(data=data)
+        result.is_valid(raise_exception=True)
+        return Response(result.data, status=status.HTTP_200_OK)
