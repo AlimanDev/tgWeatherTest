@@ -1,0 +1,16 @@
+backend/db.sqlite3
+backend/media
+backend/logs
+
+.idea
+.env
+venv
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.log
+
+poetry.lock
+pyproject.toml
