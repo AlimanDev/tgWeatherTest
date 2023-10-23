@@ -2,7 +2,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 
-from apps.libraries.exceptions import YandexWeatherException
+from libraries.exceptions import YandexWeatherException
 
 
 class Weather:
