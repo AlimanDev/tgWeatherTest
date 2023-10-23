@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 
@@ -13,3 +15,7 @@ class WeatherRequest(BaseModel):
 
 class WeatherResponse(WeatherFact):
     pass
+
+
+class CityWeather(WeatherFact):
+    timestamp: float
