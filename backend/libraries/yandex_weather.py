@@ -4,11 +4,15 @@ from urllib3 import Retry
 
 from libraries.exceptions import YandexWeatherException
 
+import urllib3
+
+urllib3.disable_warnings()
+
 
 class YandexWeather:
     def __init__(self, lat: float, lon: float, token: str):
         self.api = 'https://api.weather.yandex.ru/v2/'
-        self.params = {'lat': lat, 'long': lon, 'lang': 'ru_Ru'}
+        self.params = {'lat': lat, 'lon': lon}
         self.header = {'X-Yandex-API-Key': token}
 
         retry_strategy = Retry(
@@ -29,7 +33,6 @@ class YandexWeather:
 
     def query(self, url: str) -> dict:
         """Возвращает результат запроса."""
-
         try:
             response = self.session.get(
                 url=url,

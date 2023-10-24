@@ -1,8 +1,7 @@
-import aiohttp
 from aiohttp import ClientConnectorError
 from aiohttp_retry import RetryClient, ExponentialRetry
 
-from tgbot.exceptions import WeatherException
+from exceptions import WeatherException
 
 
 async def aquery(url: str) -> dict:

@@ -25,7 +25,7 @@ def weather_save_to_db(city: str, data: WeatherData) -> dict:
 
     write_file(path=settings.PATH_FILE, data=data, mode=mode)
 
-    return data
+    return value
 
 
 def get_weather_from_db(city: str) -> dict:

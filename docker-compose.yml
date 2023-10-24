@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart: unless-stopped
+    command: >
+      sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 conf.wsgi --reload"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
+    env_file:
+      - .env
+    stdin_open: true
+    tty: true
+
+  tgbot:
+    build:
+      context: ./tgbot
+      dockerfile: Dockerfile
+    container_name: tgbot
+    restart: unless-stopped
+    command: >
+      sh -c "python main.py"
+    volumes:
+      - ./tgbot:/tgbot
+    env_file:
+      - .env
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true

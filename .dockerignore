@@ -1,0 +1,12 @@
+.env
+.env_example
+.gitignore
+poetry.lock
+pyproject.toml
+README.md
+dc.build.yml
+
+backend/db.sqlite3
+backend/Dockerfile
+
+tgbot/Dockerfile
