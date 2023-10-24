@@ -9,7 +9,7 @@ class WeatherFact(BaseModel):
     pressure_mm: int
 
 
-class WeatherRequest(BaseModel):
+class WeatherData(BaseModel):
     fact: WeatherFact
 
 

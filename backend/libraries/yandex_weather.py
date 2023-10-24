@@ -5,17 +5,12 @@ from urllib3 import Retry
 from libraries.exceptions import YandexWeatherException
 
 
-class Weather:
+class YandexWeather:
     def __init__(self, lat: float, lon: float, token: str):
-        self.url = 'https://api.weather.yandex.ru/v2/'
-        self.params = {
-            'lat': lat,
-            'long': lon,
-            'lang': 'ru_Ru'
-        }
-        self.lat = lat
-        self.lon = lon
+        self.api = 'https://api.weather.yandex.ru/v2/'
+        self.params = {'lat': lat, 'long': lon, 'lang': 'ru_Ru'}
         self.header = {'X-Yandex-API-Key': token}
+
         retry_strategy = Retry(
             total=3,
             status_forcelist=[429, 500, 502, 503, 504],
@@ -27,7 +22,9 @@ class Weather:
         self.session.mount("https://", adapter)
 
     def get_weather(self, endpoint: str) -> dict:
-        data = self.query(url=self.url + endpoint)
+        """Возвращает данные о погоде"""
+
+        data = self.query(url=self.api + endpoint)
         return data
 
     def query(self, url: str) -> dict:

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-class CitySerializer(serializers.Serializer):
+class ParamsSerializer(serializers.Serializer):
     city = serializers.CharField(required=True)
 
 

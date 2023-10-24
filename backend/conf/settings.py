@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # apps
-    'apps.weather',
+    'weather',
 ]
 
 MIDDLEWARE = [

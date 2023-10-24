@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
-from apps.weather.views import WeatherAPI
+from weather.views import WeatherAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),

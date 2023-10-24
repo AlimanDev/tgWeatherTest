@@ -2,28 +2,33 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.weather.exceptions import GeoPosException
-from apps.weather.serializers import CitySerializer, ResultSerializer
-from apps.weather.services import get_prev_weather_data, weather_save, get_weather
-from apps.weather.utils import get_geo_pos
+from weather.exceptions import GeoPosException
+from weather.serializers import ParamsSerializer, ResultSerializer
+from weather.services import get_weather_from_db, weather_save_to_db, get_weather, has_expired
+from weather.utils import get_geo_pos
 from libraries.exceptions import YandexWeatherException
 
 
 class WeatherAPI(APIView):
 
     def get(self, request, *args, **kwargs):
-        serializer = CitySerializer(data=request.GET)
+        serializer = ParamsSerializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
+
+        request_weather = True
         city = serializer.data['city']
         success = 'ok'
         message = 'ok'
-        weather = get_prev_weather_data(city)
 
-        if not weather:
+        weather = get_weather_from_db(city)
+        if weather:
+            request_weather = has_expired(weather['timestamp'])
+
+        if request_weather:
             try:
                 lat, lon = get_geo_pos(city=city)
                 weather_data = get_weather(lat, lon)
-                weather = weather_save(city, weather_data)
+                weather = weather_save_to_db(city, weather_data)
             except (YandexWeatherException, GeoPosException) as e:
                 success = 'error'
                 message = str(e)
