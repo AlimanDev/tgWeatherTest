@@ -8,7 +8,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 from tgbot.config import BOT_TOKEN
 from tgbot.exceptions import WeatherException
-from tgbot.schemas import Result
+from tgbot.schemas import Result, ResultSuccess
 from tgbot.utils import aquery
 
 bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
@@ -50,13 +50,16 @@ async def process_result(message: types.Message, state: FSMContext) -> None:
     url = f'http://127.0.0.1:8000/weather/?city={message.text}'
     try:
         response = await aquery(url=url)
-        data = Result.model_validate(response)
-        await message.answer(message_template.format(
-            city=message.text,
-            temp=data.temp,
-            pressure_mm=data.pressure_mm,
-            wind_speed=data.wind_speed
-        ))
+        result = Result.model_validate(response)
+        if result.success == ResultSuccess.ok:
+            await message.answer(message_template.format(
+                city=message.text,
+                temp=result.data.temp,
+                pressure_mm=result.data.pressure_mm,
+                wind_speed=result.data.wind_speed
+            ))
+        else:
+            await message.answer(result.message)
     except WeatherException:
         await message.answer('Сервер временно не доступен, попробуйте позже')
 

@@ -26,7 +26,7 @@ class Weather:
         self.session = requests.Session()
         self.session.mount("https://", adapter)
 
-    def get_weather(self, endpoint: str):
+    def get_weather(self, endpoint: str) -> dict:
         data = self.query(url=self.url + endpoint)
         return data
 

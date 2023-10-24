@@ -3,9 +3,7 @@ from datetime import datetime
 from django.conf import settings
 
 from apps.weather.schemas import CityWeather, WeatherRequest
-from apps.weather.utils import JsonCRUD
-
-js = JsonCRUD(f"{settings.BASE_DIR}/data/", 'cities.json')
+from apps.weather.utils import write_file, read_file
 
 
 def weather_save(city: str, data: WeatherRequest) -> dict:
@@ -16,13 +14,13 @@ def weather_save(city: str, data: WeatherRequest) -> dict:
         'timestamp': datetime.now().timestamp(),
     }
     city_weather = CityWeather.model_validate(data)
-    js.json_write(city, city_weather)
+    write_file(settings.PATH_FILE, city, city_weather)
 
     return data
 
 
-def get_prev_weather(city: str) -> dict | None:
-    cities = js.json_read()
+def get_prev_weather_data(city: str) -> dict:
+    cities = read_file(settings.PATH_FILE)
     if cities:
         if city in cities:
             city_data = cities[city]
@@ -31,4 +29,4 @@ def get_prev_weather(city: str) -> dict | None:
             timeout = (now - prev_now).seconds
             if timeout < 30 * 60:
                 return city_data
-    return None
+    return {}
