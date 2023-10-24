@@ -2,11 +2,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from libraries.exceptions import YandexWeatherException
 from weather.exceptions import GeoPosException
 from weather.serializers import ParamsSerializer, ResultSerializer
 from weather.services import get_weather_from_db, weather_save_to_db, get_weather, has_expired
 from weather.utils import get_geo_pos
-from libraries.exceptions import YandexWeatherException
 
 
 class WeatherAPI(APIView):
@@ -22,7 +22,7 @@ class WeatherAPI(APIView):
 
         weather = get_weather_from_db(city)
         if weather:
-            request_weather = has_expired(weather['timestamp'])
+            request_weather = has_expired(weather['timestamp'], minute=30)
 
         if request_weather:
             try:

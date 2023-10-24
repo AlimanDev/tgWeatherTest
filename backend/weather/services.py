@@ -48,11 +48,10 @@ def get_weather(lat: float, lon: float) -> WeatherData:
     return model
 
 
-def has_expired(data_in_timestamp: float) -> bool:
+def has_expired(data_in_timestamp: float, minute: int) -> bool:
     """Определяет срок годности данных"""
 
-    minute = 60
-    expiry_time = 30 * minute
+    expiry_time = minute * 60
     dt_now = datetime.now()
     weather_dt = datetime.fromtimestamp(data_in_timestamp)
     seconds_passed = (dt_now - weather_dt).seconds
