@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from libraries.exceptions import YandexWeatherException
 from weather.exceptions import GeoPosException
 from weather.serializers import ParamsSerializer, ResultSerializer
-from weather.services import get_weather_from_db, weather_save_to_db, get_weather, has_expired
+from weather.services import get_weather_from_db, weather_save_to_db, fetch_weather, has_expired
 from weather.utils import get_geo_pos
 
 
@@ -27,7 +27,7 @@ class WeatherAPI(APIView):
         if request_weather:
             try:
                 lat, lon = get_geo_pos(city=city)
-                weather_data = get_weather(lat, lon)
+                weather_data = fetch_weather(lat, lon)
                 weather = weather_save_to_db(city, weather_data)
             except (YandexWeatherException, GeoPosException) as e:
                 success = 'error'

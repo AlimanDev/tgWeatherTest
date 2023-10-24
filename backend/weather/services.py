@@ -37,7 +37,7 @@ def get_weather_from_db(city: str) -> dict:
         return {}
 
 
-def get_weather(lat: float, lon: float) -> WeatherData:
+def fetch_weather(lat: float, lon: float) -> WeatherData:
     """В погоду по координатам"""
 
     endpoint = 'informers/'
