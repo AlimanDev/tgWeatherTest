@@ -6,7 +6,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from tgbot.config import BOT_TOKEN
+from tgbot.config import BOT_TOKEN, SERVER_API
 from tgbot.exceptions import WeatherException
 from tgbot.schemas import Result, ResultSuccess
 from tgbot.utils import aquery
@@ -47,7 +47,7 @@ async def process_city(message: types.Message, state: FSMContext) -> None:
 
 @dp.message(WeatherState.city)
 async def process_result(message: types.Message, state: FSMContext) -> None:
-    url = f'http://127.0.0.1:8000/weather/?city={message.text}'
+    url = f'{SERVER_API}?city={message.text}'
     try:
         response = await aquery(url=url)
         result = Result.model_validate(response)
