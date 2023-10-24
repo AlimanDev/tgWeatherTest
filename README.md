@@ -1,8 +1,13 @@
 ### Инструкция по запуску
-1. Создать virtualenv (python >= 3.10)
-2. Установить зависимости из requirements.txt
-3. Создать .env файл (взять из .env_example)
-4. Запустить backend ```python backend/manage.py runserver```
-5. Запустить миграцию ```python backend/manage.py migrate```
-6. Запустить тесты ```python backend/manage.py test```
-7. Запустить tgbot ```python tgbot/main.py```
+> Создать .env файл в корне проекта (взять из .env_example)
+#### Запуск через докер
+```docker
+docker compose up --build
+```
+#### Локальный запуск
+> Добавить в .env: ```SERVER_DOMAIN=127.0.0.1```
+```python
+python backend/manage.py migrate
+python backend/manage.py runserver
+python tgbot/main.py
+```

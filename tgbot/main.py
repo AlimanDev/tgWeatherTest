@@ -17,9 +17,10 @@ bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher()
 
 message_template = """
-Температура города {city}": <b>{temp}</>
-Атмосферное давление: <b>{pressure_mm}</>
-Скорость ветра: <b>{wind_speed}</>
+<b>{city}</b>
+Температура по Цельсию: <b>{temp}</b>
+Атмосферное давление: <b>{pressure_mm}</b>
+Скорость ветра: <b>{wind_speed}</b>
 """
 
 
@@ -47,11 +48,8 @@ async def process_city(message: types.Message, state: FSMContext) -> None:
 
 @dp.message(WeatherState.city)
 async def process_result(message: types.Message, state: FSMContext) -> None:
-    print('process_result')
-    url = f'{SERVER_API}?city={message.text}'
-    print(url)
     try:
-        response = await aquery(url=url)
+        response = await aquery(url=f'{SERVER_API}?city={message.text}')
         result = Result.model_validate(response)
         if result.success == ResultSuccess.ok:
             await message.answer(message_template.format(
