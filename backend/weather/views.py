@@ -33,10 +33,10 @@ class WeatherAPI(APIView):
                 success = 'error'
                 message = str(e)
 
-        response_data = {
+        result = {
             'success': success,
             'message': message,
             'data': weather
         }
-        result = ResultSerializer(response_data)
-        return Response(result.data, status=status.HTTP_200_OK)
+        response = ResultSerializer(result)
+        return Response(response.data, status=status.HTTP_200_OK)
