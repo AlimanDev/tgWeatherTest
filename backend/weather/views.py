@@ -38,6 +38,5 @@ class WeatherAPI(APIView):
             'message': message,
             'data': weather
         }
-        result = ResultSerializer(data=response_data)
-        result.is_valid(raise_exception=True)
+        result = ResultSerializer(response_data)
         return Response(result.data, status=status.HTTP_200_OK)
