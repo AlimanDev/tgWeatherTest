@@ -11,10 +11,10 @@ from tgbot.exceptions import WeatherException
 from tgbot.schemas import Result, ResultSuccess
 from tgbot.utils import aquery
 
+logging.basicConfig(level=logging.INFO)
+
 bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher()
-
-logging.basicConfig(level=logging.INFO)
 
 message_template = """
 Температура города {city}": <b>{temp}</>
