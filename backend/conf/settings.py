@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%36@4@@^acw5(#^9&c%c^qzsia_f1*nfq79umn^ca$a)fnp1&t'
+SECRET_KEY = os.getenv('SECRET_KEY', 'GenKey')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -116,4 +116,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 YANDEX_KEY = os.environ['YANDEX_KEY']
+
 PATH_FILE = BASE_DIR / 'data/cities.json'

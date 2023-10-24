@@ -1,15 +1,13 @@
 import json
 import os
 
-from django.conf import settings
 from geopy import geocoders
 
 from apps.weather.exceptions import GeoPosException
-from apps.weather.schemas import WeatherRequest, CityWeather
-from libraries.yandex_weather import Weather
+from apps.weather.schemas import CityWeather
 
 
-def geo_pos(city: str) -> tuple:
+def get_geo_pos(city: str) -> tuple:
     geolocator = geocoders.Nominatim(user_agent='telebot')  # FIXME
     geocode = geolocator.geocode(city)
     if not geocode:
@@ -18,14 +16,6 @@ def geo_pos(city: str) -> tuple:
     longitude = geocode.longitude
     return latitude, longitude
 
-
-def weather(lat: float, lon: float) -> WeatherRequest:
-    endpoint = 'informers/'
-    data = Weather(
-        lat=lat, lon=lon, token=settings.YANDEX_KEY
-    ).get_weather(endpoint)
-    model = WeatherRequest.model_validate(data)
-    return model
 
 def write_file(path: str, city: str, values: CityWeather):
     data = read_file(path)

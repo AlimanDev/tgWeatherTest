@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 
 from apps.weather.exceptions import GeoPosException
 from apps.weather.serializers import CitySerializer, ResultSerializer
-from apps.weather.services import get_prev_weather_data, weather_save
-from apps.weather.utils import geo_pos, weather
+from apps.weather.services import get_prev_weather_data, weather_save, get_weather
+from apps.weather.utils import get_geo_pos
 from libraries.exceptions import YandexWeatherException
 
 
@@ -15,29 +15,23 @@ class WeatherAPI(APIView):
         serializer = CitySerializer(data=request.GET)
         serializer.is_valid(raise_exception=True)
         city = serializer.data['city']
-
         success = 'ok'
         message = 'ok'
-        data = {  # Mock
-            "temp": 12,
-            "wind_speed": 1.3,
-            "pressure_mm": 729
-        }
+        weather = get_prev_weather_data(city)
 
-        try:
-            lat, lon = geo_pos(city=city)
-            data = get_prev_weather_data(city)
-            if not data:
-                weather_data = weather(lat, lon)
-                data = weather_save(city, weather_data)
-        except (YandexWeatherException, GeoPosException) as e:
-            success = 'error'
-            message = str(e)
+        if not weather:
+            try:
+                lat, lon = get_geo_pos(city=city)
+                weather_data = get_weather(lat, lon)
+                weather = weather_save(city, weather_data)
+            except (YandexWeatherException, GeoPosException) as e:
+                success = 'error'
+                message = str(e)
 
         response_data = {
             'success': success,
             'message': message,
-            'data': data
+            'data': weather
         }
         result = ResultSerializer(data=response_data)
         result.is_valid(raise_exception=True)

@@ -4,6 +4,7 @@ from django.conf import settings
 
 from apps.weather.schemas import CityWeather, WeatherRequest
 from apps.weather.utils import write_file, read_file
+from libraries.yandex_weather import Weather
 
 
 def weather_save(city: str, data: WeatherRequest) -> dict:
@@ -30,3 +31,12 @@ def get_prev_weather_data(city: str) -> dict:
             if timeout < 30 * 60:
                 return city_data
     return {}
+
+
+def get_weather(lat: float, lon: float) -> WeatherRequest:
+    endpoint = 'informers/'
+    data = Weather(
+        lat=lat, lon=lon, token=settings.YANDEX_KEY
+    ).get_weather(endpoint)
+    model = WeatherRequest.model_validate(data)
+    return model
