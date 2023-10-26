@@ -25,8 +25,8 @@ class WeatherAPI(APIView):
             'data': {}
         }
 
-        weather_db = WeatherRepositoryJson(city=city)
-        weather = weather_db.load()
+        weather_repository = WeatherRepositoryJson(city=city)
+        weather = weather_repository.load()
         if weather:
             need_request_weather = has_expired(weather['timestamp'], minute=30)
 
@@ -40,7 +40,7 @@ class WeatherAPI(APIView):
                     'pressure_mm': weather_data.fact.pressure_mm,
                     'timestamp': datetime.now().timestamp(),
                 }
-                weather_db.save(data=weather)
+                weather_repository.save(data=weather)
             except (YandexWeatherException, GeoPosException) as e:
                 result['success'] = 'error'
                 result['message'] = str(e)
