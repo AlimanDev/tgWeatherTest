@@ -1,50 +1,54 @@
+from abc import abstractmethod
 from datetime import datetime
 
 from django.conf import settings
 
-from libraries.yandex_weather import YandexWeather
-from weather.schemas import WeatherData
-from weather.utils import write_file, read_file
+from weather.schemas import YandexWeatherData
+from weather.utils import JsonManager, YandexWeather
 
 
-def weather_save_to_db(city: str, data: WeatherData) -> dict:
-    """Сохраняет данные о погоде"""
+class WeatherRepository:
+    @abstractmethod
+    def save(self, data: dict):
+        pass
 
-    mode = 'w'
-    value = {
-        'temp': data.fact.temp,
-        'wind_speed': data.fact.wind_speed,
-        'pressure_mm': data.fact.pressure_mm,
-        'timestamp': datetime.now().timestamp(),
-    }
-
-    data = read_file(path=settings.PATH_FILE)
-    if data:
-        mode = 'w+'
-    data.update({city: value})
-
-    write_file(path=settings.PATH_FILE, data=data, mode=mode)
-
-    return value
+    @abstractmethod
+    def load(self) -> dict:
+        pass
 
 
-def get_weather_from_db(city: str) -> dict:
-    """Возвращает данные о погоде города"""
+class WeatherRepositoryJson(WeatherRepository):
+    def __init__(self, city):
+        self.city = city
+        self.json = JsonManager(settings.PATH_FILE)
 
-    try:
-        return read_file(settings.PATH_FILE)[city]
-    except KeyError:
-        return {}
+    def save(self, data: dict):
+        try:
+            data_storage = self.json.read()
+            mode = 'w+'
+        except FileNotFoundError:
+            data_storage = {}
+            mode = 'w'
+
+        data_storage.update({self.city: data})
+        self.json.write(data=data_storage, mode=mode)
+
+    def load(self) -> dict:
+        self.json = JsonManager(settings.PATH_FILE)
+        try:
+            data = self.json.read()
+            return data[self.city]
+        except (KeyError, FileNotFoundError):
+            return {}
 
 
-def fetch_weather(lat: float, lon: float) -> WeatherData:
-    """В погоду по координатам"""
+def fetch_yandex_weather(lat: float, lon: float) -> YandexWeatherData:
+    """Возвращает погоду по координатам"""
 
     endpoint = 'informers/'
-    data = YandexWeather(
-        lat=lat, lon=lon, token=settings.YANDEX_KEY
-    ).get_weather(endpoint)
-    model = WeatherData.model_validate(data)
+    ya_weather = YandexWeather(lat=lat, lon=lon, token=settings.YANDEX_KEY)
+    data = ya_weather.get_weather(endpoint)
+    model = YandexWeatherData.model_validate(data)
     return model
 
 
@@ -53,8 +57,8 @@ def has_expired(data_in_timestamp: float, minute: int) -> bool:
 
     expiry_time = minute * 60
     dt_now = datetime.now()
-    weather_dt = datetime.fromtimestamp(data_in_timestamp)
-    seconds_passed = (dt_now - weather_dt).seconds
+    dt_weather = datetime.fromtimestamp(data_in_timestamp)
+    seconds_passed = (dt_now - dt_weather).seconds
     if seconds_passed > expiry_time:
         return True
 

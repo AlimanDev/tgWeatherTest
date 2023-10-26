@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from pydantic import BaseModel
 
 
@@ -9,9 +7,5 @@ class WeatherFact(BaseModel):
     pressure_mm: int
 
 
-class WeatherData(BaseModel):
+class YandexWeatherData(BaseModel):
     fact: WeatherFact
-
-
-class CityWeather(WeatherFact):
-    timestamp: float
