@@ -17,26 +17,25 @@ class WeatherRepository:
         pass
 
 
-class WeatherRepositoryJson(WeatherRepository):
+class WeatherRepositoryJson(WeatherRepository, JsonManager):
     def __init__(self, city):
+        super(JsonManager, self).__init__(filename=settings.PATH_FILE)
         self.city = city
-        self.json = JsonManager(settings.PATH_FILE)
 
     def save(self, data: dict):
         try:
-            data_storage = self.json.read()
-            mode = 'w+'
+            data_storage = self.read()
         except FileNotFoundError:
             data_storage = {}
-            mode = 'w'
 
         data_storage.update({self.city: data})
-        self.json.write(data=data_storage, mode=mode)
+
+        mode = 'w+' if data_storage else 'w'
+        self.write(data=data_storage, mode=mode)
 
     def load(self) -> dict:
-        self.json = JsonManager(settings.PATH_FILE)
         try:
-            data = self.json.read()
+            data = self.read()
             return data[self.city]
         except (KeyError, FileNotFoundError):
             return {}
