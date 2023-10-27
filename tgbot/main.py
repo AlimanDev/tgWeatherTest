@@ -29,13 +29,21 @@ class WeatherState(StatesGroup):
     city = State()
 
 
-@dp.message(CommandStart())
-async def command_start(message: types.Message, state: FSMContext) -> None:
-    button_text = 'Узнать погоду'
+button_text = 'Узнать погоду'
+
+
+def get_button():
     kb = [
         [types.KeyboardButton(text=button_text)]
     ]
     keyboard = types.ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+    return keyboard
+
+
+@dp.message(CommandStart())
+async def command_start(message: types.Message, state: FSMContext) -> None:
+    keyboard = get_button()
+
     await state.set_state(WeatherState.button)
     await message.answer(f"Нажмите на кнопку {button_text}", reply_markup=keyboard)
 
@@ -52,16 +60,21 @@ async def process_result(message: types.Message, state: FSMContext) -> None:
         response = await aquery(url=f'{SERVER_API}?city={message.text}')
         result = Result.model_validate(response)
         if result.success == ResultSuccess.ok:
-            await message.answer(message_template.format(
+            result_message = message_template.format(
                 city=message.text,
                 temp=result.data.temp,
                 pressure_mm=result.data.pressure_mm,
                 wind_speed=result.data.wind_speed
-            ))
+            )
         else:
-            await message.answer(result.message)
+            result_message = result.message
     except WeatherException:
-        await message.answer('Сервер временно не доступен, попробуйте позже')
+        result_message = 'Сервер временно не доступен, попробуйте позже'
+
+    keyboard = get_button()
+    await state.set_state(WeatherState.button)
+    await message.answer(result_message)
+    await message.answer(f"Нажмите на кнопку {button_text}", reply_markup=keyboard)
 
 
 async def main():

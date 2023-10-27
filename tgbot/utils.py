@@ -1,4 +1,4 @@
-from aiohttp import ClientConnectorError
+from aiohttp import ClientConnectorError, ClientResponseError
 from aiohttp_retry import RetryClient, ExponentialRetry
 
 from exceptions import WeatherException
@@ -11,7 +11,7 @@ async def aquery(url: str) -> dict:
         async with retry_client.get(url) as response:
             data = await response.json()
             return data
-    except ClientConnectorError as e:
+    except (ClientConnectorError, ClientResponseError) as e:
         raise WeatherException(e)
     finally:
         await retry_client.close()

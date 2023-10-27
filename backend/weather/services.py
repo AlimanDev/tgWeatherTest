@@ -18,8 +18,8 @@ class WeatherRepository:
 
 
 class WeatherRepositoryJson(WeatherRepository, JsonManager):
-    def __init__(self, city):
-        super(JsonManager, self).__init__(filename=settings.PATH_FILE)
+    def __init__(self, city: str):
+        super().__init__(filename=settings.PATH_FILE)
         self.city = city
 
     def save(self, data: dict):
